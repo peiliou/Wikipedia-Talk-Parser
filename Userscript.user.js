@@ -98,7 +98,7 @@
 				}
 			});
 
-			clone.querySelectorAll('a[title*="Category:"],a[title*="Wikipedia:"],a[title*="Talk:"]').forEach(el => el.removeAttribute('title'));
+			clone.querySelectorAll('a:not([title*="User:"])').forEach(el => el.removeAttribute('title'));
 
 			let els = clone.querySelectorAll('a[title*=":"]');
 			if (config.debug) console.log(els);
