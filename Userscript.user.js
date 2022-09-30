@@ -80,6 +80,13 @@
 		const has_owner = node.innerText.match(/\([A-Z]+\).*?$/m);
 
 		const clone = node.cloneNode(true);
+		clone.querySelectorAll('style,small').forEach(noise => noise.remove());
+
+		const bullets = clone.querySelectorAll('ul,li,span,big');
+		bullets.forEach(bullet => {
+			bullet.replaceWith(...bullet.childNodes);
+		});
+
 		if (has_owner) {
 			const noises = clone.querySelectorAll('.autosigned');
 			noises.forEach(noise => {
@@ -90,14 +97,8 @@
 					noise.replaceWith(...noise.childNodes);
 				}
 			});
-			clone.querySelectorAll('style,small').forEach(noise => noise.remove());
 
-			const bullets = clone.querySelectorAll('ul,li,span');
-			bullets.forEach(bullet => {
-				bullet.replaceWith(...bullet.childNodes);
-			});
-
-			clone.querySelectorAll('.mw-redirect,a[title*="Category:"],a[title*="Wikipedia:"]').forEach(el => el.removeAttribute('title'));
+			clone.querySelectorAll('a[title*="Category:"],a[title*="Wikipedia:"],a[title*="Talk:"]').forEach(el => el.removeAttribute('title'));
 
 			let els = clone.querySelectorAll('a[title*=":"]');
 			if (config.debug) console.log(els);
