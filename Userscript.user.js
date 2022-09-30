@@ -90,13 +90,14 @@
 					noise.replaceWith(...noise.childNodes);
 				}
 			});
+			clone.querySelectorAll('style,small').forEach(noise => noise.remove());
 
-			const bullets = clone.querySelectorAll('ul,li');
+			const bullets = clone.querySelectorAll('ul,li,span');
 			bullets.forEach(bullet => {
 				bullet.replaceWith(...bullet.childNodes);
 			});
 
-			clone.querySelectorAll('.mw-redirect').forEach(el => el.removeAttribute('title'));
+			clone.querySelectorAll('.mw-redirect,a[title*="Category:"],a[title*="Wikipedia:"]').forEach(el => el.removeAttribute('title'));
 
 			let els = clone.querySelectorAll('a[title*=":"]');
 			if (config.debug) console.log(els);
@@ -175,5 +176,42 @@
 		});
 
 		if (config.debug) console.log(node);
+	}
+
+	const fetch_data = (url) => {
+		return new Promise(resolve => {
+			fetch(url).then(response => {
+				if (response.ok) {
+					return response.text();
+				}
+				throw new Error('Failed to Open: ' + url);
+			}).then(data => {
+				resolve(data);
+			}).catch(error => {
+				throw error
+			});
+		});
+
+	}
+
+	const post_data_xml = (url, data) => {
+		return new Promise(resolve => {
+			GM_xmlhttpRequest({
+				method: "POST",
+				url: url,
+				headers: {
+					"Content-type": "application/json",
+					"Accept-Encoding": "gzip, deflate, br"
+				},
+				data: data,
+				onload: function (response) {
+					if (response.status >= 200 && response.status < 400) {
+						resolve(JSON.parse(response.responseText));
+					} else {
+						throw response;
+					}
+				}
+			});
+		});
 	}
 })();
