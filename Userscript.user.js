@@ -25,16 +25,12 @@
 
 		if (nested_level == 1 && node.parentNode.parentNode.className == "mw-parser-output") {
 			node = node.parentNode;
-			let text = node.innerText.replace(/\n\[\nreply\n\]/g, '');
-			const has_owner = text.match(/\([A-Z]+\).*?$/m);
+
+			let text = preprocess(node).innerText;
 
 			if (config.debug) console.log(text)
 
-			if (config.remove_comment_info && has_owner) text = sanitize_text(text, config);
-
-			if (config.debug) console.log([text, has_owner])
-
-			nested_comments.unshift(text);
+			nested_comments.unshift(text.trim());
 
 			if (config.debug) console.log(node);
 		} else {
@@ -68,7 +64,6 @@
 
 			if (node.innerText) {
 				if (node.nodeName == node_name || node.nodeName == 'P' || node.nodeName[0] == 'H') {
-
 					if (config.debug) console.log(node);
 
 					const clone = node.cloneNode(true);
@@ -81,13 +76,79 @@
 		return nested_comments;
 	}
 
+	const preprocess = (node) => {
+		const has_owner = node.innerText.match(/\([A-Z]+\).*?$/m);
+
+		const clone = node.cloneNode(true);
+		if (has_owner) {
+			const noises = clone.querySelectorAll('.autosigned');
+			noises.forEach(noise => {
+				if (config.remove_comment_info) {
+					noise.remove();
+				} else {
+					noise.childNodes[0].remove();
+					noise.replaceWith(...noise.childNodes);
+				}
+			});
+
+			const bullets = clone.querySelectorAll('ul,li');
+			bullets.forEach(bullet => {
+				bullet.replaceWith(...bullet.childNodes);
+			});
+
+			clone.querySelectorAll('.mw-redirect').forEach(el => el.removeAttribute('title'));
+
+			let els = clone.querySelectorAll('a[title*=":"]');
+			if (config.debug) console.log(els);
+
+			let el = els[0];
+			if (!el) return clone;
+
+			let title_prefix = "";
+			els.forEach(e => {
+				if (!title_prefix) {
+					title_prefix = e.title.split(":")[0];
+					if (config.debug) console.log(e.title);
+				} else if (e.title.split(":")[0] == title_prefix) {
+					el = e;
+				}
+			});
+
+			while (el.parentNode != clone) {
+				let temp = el;
+				el = el.parentNode;
+
+				if (config.remove_comment_info) {
+					temp.remove();
+				}
+			}
+			if (config.debug) console.log(el);
+
+			const verify = el.querySelectorAll('a[title*=":"]')
+			if (verify.length > 0) {
+				el = verify[verify.length - 1];
+			}
+
+			if (config.debug) console.log(el);
+
+			while (el) {
+				let temp = el;
+				el = el.nextSibling;
+				if (config.remove_comment_info || temp.className && temp.className.includes('replylink')) {
+					temp.remove()
+				}
+			}
+		}
+
+		return clone;
+	}
+
 	const prepend_if_valid = (stack, node, config) => {
-		let text = node.innerText.replace(/Reply\[reply\].?(\\n)*$/mg, '');
-		const has_owner = text.match(/\([A-Z]+\).*?$/m);
+		const has_owner = node.innerText.match(/\([A-Z]+\).*?$/m);
 
-		if (config.debug) console.log(text);
+		if (config.debug) console.log(node);
 
-		if (config.remove_comment_info && has_owner) text = sanitize_text(text, config);
+		let text = preprocess(node).innerText;
 
 		if (config.debug) console.log(text);
 
@@ -98,38 +159,21 @@
 			if (config.bind_comments_to_users && !has_owner) {
 				stack[0] = text + stack[0]
 			} else {
-				stack.unshift(text);
+				stack.unshift(text.trim());
 			}
 		}
-	}
-
-	const sanitize_text = (text, config) => {
-		const len = text.length;
-		if (text[len - 1] == '\n') text = text.substring(0, len - 1);
-		text = text.replace(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/mg, ''); //remove ip noise
-
-		let highest_index = -1;
-		const split_points = ["\n", " -", "! ", "? ", " —", "--", ".", "  ("];
-
-		for (let sp of split_points) {
-			const last_index = text.lastIndexOf(sp);
-
-			if (last_index > highest_index) {
-				highest_index = last_index
-			}
-		}
-
-		return highest_index > 0 ? text.substring(0, highest_index + 1).trim() : text;
 	}
 
 	const remove_nested_comments = (node) => {
 		const nested_elements = node.querySelectorAll('a[class*="replylink-reply"]');
 		nested_elements.forEach((el, index) => {
 			const origin = el.parentNode.parentNode.parentNode;
-			//console.log(origin);
 			if (index > 0) {
 				origin.remove();
 			}
+			el.parentNode.remove();
 		});
+
+		if (config.debug) console.log(node);
 	}
 })();
