@@ -15,7 +15,7 @@ timestamp: date
 type: string
 ```
 
-## Parser Configurations (can be found in Userscript.user.js or main.template.js)
+## Parser Configurations (can be found in the source code)
 ```
 "include_title":false,         //include section title of a talk
 "bind_comments_to_users":true, //all comments are associated with inferred users using timestamp (except last comment)
@@ -28,12 +28,12 @@ type: string
 
 2. [Install](https://github.com/peiliou/Wikipedia-Talk-Parser/raw/main/Userscript.user.js) Userscript.user.js
 
-3. Go to any wikipedia talk page -> open web developer tools using F12 -> click the console tab -> click any reply button on a wiki talk page to see parser results in the console
+3. Go to any wikipedia talk page -> open web developer tools using F12 -> click the console tab -> the console will show parsed results when a reply button is clicked on a wiki talk page
 
-4. Continue adding code inside the userscript to process the parser results (for further developments)
+4. Continue adding code inside the userscript to process the parsed results (for further developments)
 
 ---
 
-**Alternatively, you can also use it as a library (see example files in the `lib` folder)**
+**Alternatively, you can also use it as a library (see example files in the [lib](https://github.com/peiliou/Wikipedia-Talk-Parser/tree/main/lib) folder)**
 
 ---
