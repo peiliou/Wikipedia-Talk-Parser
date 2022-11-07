@@ -19,6 +19,8 @@ A generalized Wikipedia Talk (Conversation+Metadata) parser with configurations 
 
 **Alternatively, you can also use it as a library (see example files in the `lib` folder)**
 
+---
+
 ## Parser Configurations (can be changed in wiki_parser.js or Userscript.user.js)
 ```
 "include_title":false,         //include section title of a talk
