@@ -29,15 +29,12 @@
 	}));
     
 	const parse_from_element = (el, config) => {
-    
-	    let nested_level = JSON.parse(el.parentNode.getAttribute('data-mw-comment')).level;
-    
 	    let node = el.parentNode;
     
 	    const nested_comments = [];
 	    const metadata = [];
     
-	    if (nested_level == 1 && node.parentNode.parentNode.className == "mw-parser-output") {
+	    if (el.parentNode.parentNode.parentNode.nodeName == 'DIV' && node.parentNode.parentNode.className == "mw-parser-output") {
 		node = node.parentNode;
     
 		const clone = node.cloneNode(true);
