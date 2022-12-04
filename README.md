@@ -38,21 +38,28 @@ type: string
 
 ---
 
-## The Parsing Algorithm
-1. It starts by checking if the comment is at the root level, since the comment DOM layout at the root level is different from other levels
-2. It creates deep copies of original nodes to process them without side effects
-3. Starting from the selected comment, it backtracks its preceding comment until the root level is reached
+## Parser Algorithm
+- It starts by checking if the comment is at the root level, since the comment DOM layout at the root level is different from other levels
+- It creates deep copies of original nodes to process them without side effects
+- Starting from the selected comment, it backtracks its preceding comment until the root level is reached
    - All comments preceding it at the same level are traversed before jumping back towards the root level
-   - Comment texts (with or without the comment info) and metadata (if available) of all traversed comments are saved
-4. After reaching the root level, it traverses backwards until the section title is reached
-   - Comment texts (with or without the comment info) and metadata (if available) of all traversed comments are saved
+   - Comment texts (with or without the comment info) and metadata of all traversed comments are saved
+- After reaching the root level, it traverses backwards until the section title is reached
+   - Comment texts (with or without the comment info) and metadata of all traversed comments are saved
+   
+---
+
+### Helper Functions
 
 **`remove_nested_comments(node, metadata)`**: remove all non-primary comments of `node` and add metadata of the first comment to `metadata`
 
-**`prepend_if_valid(stack, node)`**: add `node` into the `stack` with behaviors affected by settings of `config`
-   >- Duplication checking
+**`prepend_if_valid(stack, node)`**: add `node` into the `stack`
+   >- Configurations available
+   >- Validation checking
    >- Catches some edge cases
    >- Calls the helper function `preprocess(node)`
 
-**`preprocess(node)`**: remove noises of `node` with behaviors affected by settings of `config` to permit the clean use of `node.innerText`
+**`preprocess(node)`**: remove noises of `node` with configuration behaviors
+   >- Configurations available
    >- Catches some edge cases
+   >- Permits clean usage of `node.innerText`
