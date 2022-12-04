@@ -14,7 +14,7 @@
 	'use strict';
 	const config = {
 		"include_title": false, //include section title of a talk
-		"bind_comments_to_users": true, //all comments are associated with inferred users using timestamp (except last comment)
+		"bind_comments_to_users": true, //all comments are associated with inferred users using timestamp
 		"remove_comment_info": true, //remove comment username and timestamp
 		"debug": false, //troubleshooting only
 	}
@@ -22,13 +22,13 @@
 	const replyButtons = document.querySelectorAll('a[class*="replylink-reply"]');
 
 	replyButtons.forEach(button => button.addEventListener('click', async (e) => {
-		const [res, metadata] = parse_from_element(button, config);
+		const [res, metadata] = parse_from_element(button);
 
 		console.log(res);
 		console.log(metadata);
 	}));
 
-	const parse_from_element = (el, config) => {
+	const parse_from_element = (el) => {
 		let node = el.parentNode;
 
 		const nested_comments = [];
@@ -39,7 +39,7 @@
 
 			const clone = node.cloneNode(true);
 			remove_nested_comments(clone, metadata);
-			prepend_if_valid(nested_comments, clone, config);
+			prepend_if_valid(nested_comments, clone);
 		} else {
 			while (node.parentNode.nodeName != 'DIV') {
 				const prev = node.parentNode;
@@ -54,7 +54,7 @@
 
 					if (childNode.innerText) {
 						remove_nested_comments(childNode, metadata);
-						prepend_if_valid(nested_comments, childNode, config);
+						prepend_if_valid(nested_comments, childNode);
 					}
 				}
 			}
@@ -75,7 +75,7 @@
 
 					const clone = node.cloneNode(true);
 					remove_nested_comments(clone, metadata);
-					prepend_if_valid(nested_comments, clone, config);
+					prepend_if_valid(nested_comments, clone);
 				}
 			}
 		}
@@ -162,7 +162,7 @@
 
 	let break_at_next_call = false;
 
-	const prepend_if_valid = (stack, node, config) => {
+	const prepend_if_valid = (stack, node) => {
 		const has_owner = node.innerText.match(/\([A-Z]+\)((\s|(\\n))?(\[.*\])|.{0,5})?$/m);
 
 		if (config.debug) console.log(node);
