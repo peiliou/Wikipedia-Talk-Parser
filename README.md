@@ -51,15 +51,15 @@ type: string
 
 ### Helper Functions
 
-**`remove_nested_comments(node, metadata)`**: remove all non-primary comments of `node` and add metadata of the first comment to `metadata`
+`remove_nested_comments(node, metadata)`: remove all non-primary comments of `node` and add metadata of the first comment to `metadata`
 
-**`prepend_if_valid(stack, node)`**: add `node` into the `stack`
+`prepend_if_valid(stack, node)`: add `node` into the `stack`
    >- Configurations available
    >- Validation checking
    >- Catches some edge cases
    >- Calls the helper function `preprocess(node)`
 
-**`preprocess(node)`**: remove noises of `node` with configuration behaviors
+`preprocess(node)`: remove noises of `node` with configuration behaviors
    >- Configurations available
    >- Catches some edge cases
    >- Permits clean usage of `node.innerText`
