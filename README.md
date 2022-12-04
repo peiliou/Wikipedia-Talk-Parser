@@ -59,7 +59,7 @@ type: string
    >- Catches some edge cases
    >- Calls the helper function `preprocess(node)`
 
-`preprocess(node)`: remove noises of `node` with configuration behaviors
+`preprocess(node)`: remove noises of `node`
    >- Configurations available
    >- Catches some edge cases
    >- Permits clean usage of `node.innerText`
