@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Wikipedia Talk Parser
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @version      1.0.1
 // @description  try to take over the world!
 // @author       Pei
 // @match        https://*.wikipedia.org/wiki/*:*
@@ -64,12 +64,20 @@
 
 		if (config.debug) console.log(node_name);
 
-		while (node.nodeName[0] != 'H') {
+		while (!node.className.includes("ext-discussiontools-init-section")) {
 			node = node.previousElementSibling;
 
-			if (!node || !config.include_title && node.nodeName[0] == 'H') break;
+			if (!node) break;
 
-			if (node.nodeName == node_name || node.nodeName == 'P' || node.nodeName[0] == 'H') {
+			if (node.className.includes("ext-discussiontools-init-section")) {
+				if (config.include_title) {
+					break_at_next_call = true;
+				} else {
+					break;
+				}
+			}
+
+			if (node.nodeName == node_name || node.nodeName == 'P' || node.className.includes("ext-discussiontools-init-section")) {
 				if (config.debug) console.log(node);
 				if (node.innerText && node.nodeName != 'TABLE') {
 
