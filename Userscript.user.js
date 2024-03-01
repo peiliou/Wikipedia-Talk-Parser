@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Wikipedia Talk Parser
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @description  try to take over the world!
 // @author       Pei
 // @match        https://*.wikipedia.org/wiki/*:*
@@ -34,7 +34,7 @@
 		const nested_comments = [];
 		const metadata = [];
 
-		if (el.parentNode.parentNode.parentNode.nodeName == 'DIV' && node.parentNode.parentNode.className == "mw-parser-output") {
+		if (node.parentNode.parentNode.nodeName == 'DIV' && node.parentNode.parentNode.classList.contains("mw-parser-output")) {
 			node = node.parentNode;
 
 			const clone = node.cloneNode(true);
@@ -95,15 +95,15 @@
 		const has_owner = node.innerText.match(/\([A-Z]+\)((\s|(\\n))?(\[.*\])|.{0,5})?$/m);
 
 		let clone = node.cloneNode(true);
-		clone.querySelectorAll('style,.reference,sub').forEach(noise => noise.remove());
+		clone.querySelectorAll('style,.reference,sub,.mw-editsection').forEach(noise => noise.remove());
 
-		const bullets = clone.querySelectorAll('ul,li,span,big,b,pre,ol,i');
+		const bullets = clone.querySelectorAll('ul,li,span:not(.autosigned),big,b,pre,ol,i,blockquote,q');
 		bullets.forEach(bullet => {
 			bullet.replaceWith(...bullet.childNodes);
 		});
 
 		if (has_owner) {
-			const noises = clone.querySelectorAll('small');
+			const noises = clone.querySelectorAll('small,.autosigned');
 			noises.forEach(noise => {
 				if (config.remove_comment_info) {
 					noise.remove();
@@ -114,7 +114,7 @@
 			});
 			const backup = clone.cloneNode(true);
 
-			clone.querySelectorAll('a:not([title*="User:"])').forEach(el => el.removeAttribute('title'));
+			clone.querySelectorAll('a:not([title*="User:"]),a[title*="ca:User:"]').forEach(el => el.removeAttribute('title'));
 
 			let els = clone.querySelectorAll('a[title*=":"]');
 			if (config.debug) console.log(els);
